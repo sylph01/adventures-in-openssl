@@ -23,11 +23,15 @@ theme: argent
 
 # I do stuff
 
+<!-- DDR, bassoon, Magic: the Gathering, trains(rails) -->
+
 ---
 
 <!-- _class: titlepage -->
 
 # And I do stuff
+
+<!-- ISOC-JP, W3C, IETF, current work -->
 
 ---
 
@@ -56,7 +60,7 @@ theme: argent
 <!-- 
 https://en.wikipedia.org/wiki/Here_be_dragons
 
-Dungeons & Dragons, huh
+Dungeons & Dragons, am I right
 -->
 
 ----
