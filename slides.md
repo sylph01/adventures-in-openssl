@@ -39,7 +39,7 @@ theme: argent
 
 <!-- _class: titlepage -->
 
-# Caution
+# Caution before I start...
 
 ----
 
@@ -72,10 +72,10 @@ Dungeons & Dragons, huh
 # Caution
 
 - Cryptographic API can be very easy to misuse
-  - What's different from dungeons like `parse.y`-vania is that **you can hurt yourself.** Do you like security breaches?
-- I am not a cryptography expert (in the sense that 'I Am Not A Lawyer')
-  - but I've done my research
-  - If you're not sure, please have your system reviewed by a security expert
+  - What's different from dungeons like `parse.y`-vania is that **you can actually hurt yourself.** Do you like security breaches?
+- I've done my research, but I don't consider myself a cryptography expert
+  - I don't have a PhD/Master in this field, so yeah...
+  - If you're not sure, please have your system audited by a security expert before going to production
 
 ----
 
@@ -84,6 +84,8 @@ Dungeons & Dragons, huh
 - [Do Pure Ruby Dream of Encrypted Binary Protocol? / Yusuke Nakamura @ RubyKaigi 2021](https://youtu.be/hCos6p_S-qc)
   - Talks about the pain of handling hex-encoded and raw strings in Ruby
   - Also talks about implementing protocols
+
+<!-- By the way, the answer to this question is: "Yes it does. I'm going to talk about one." -->
 
 ----
 
@@ -350,6 +352,12 @@ If we don't have the building block for modern networking protocols, people woul
 - HPKE is just a building block for other protocols
 - I am working on implementing protocols that rely on HPKE
 - Also now that I came back from the OpenSSL dungeon alive, I might continue digging into this "Forgotten Realm"
+
+----
+
+# Shoutouts
+
+(TBD)
 
 ----
 
