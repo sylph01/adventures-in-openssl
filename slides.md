@@ -57,7 +57,7 @@ theme: argent
 
 # ... so there be **Dragons**
 
-<!-- 
+<!--
 https://en.wikipedia.org/wiki/Here_be_dragons
 
 Dungeons & Dragons, am I right
@@ -198,6 +198,8 @@ Some APIs in OpenSSL are intentionally left undocumented to avoid misuses by peo
 
 Yes, misuse in cryptography **can hurt yourself.**
 
+<!-- for example: https://github.com/ruby/openssl/commit/e379cc0cca776d0d4be84ddb73bb729f0fdb5ced old documentation has been removed but actual code is not. -->
+
 ----
 
 # `OpenSSL::PKey`
@@ -241,7 +243,7 @@ pkey = OpenSSL::PKey::EC.new('prime256v1')
 pkey.private_key = SecureRandom.random_bytes(32)
 ```
 
-Note: A private key of `P-256` elliptic curve consists of a 32 byte number (=scalar). 
+Note: A private key of `P-256` elliptic curve consists of a 32 byte number (=scalar).
 
 <!-- To be more accurate, it is a positive number under the "order" of the generator, which in `P-256`'s case is `0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551`. -->
 
