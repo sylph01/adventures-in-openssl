@@ -164,7 +164,7 @@ Dungeons & Dragons, huh
   - `test/openssl/test_cipher.rb`
   - ChaCha20-Poly1305 isn't in this test code, but uses the same API as AES-GCM
 - HMAC-SHA256, HMAC-SHA512
-  - Even with SHA256 and SHA512 only I can implement HMAC
+  - Even with SHA256 and SHA512 only, I can implement HMAC
   - Actually we have HKDF itself but we need to use some parts of HKDF and customize it
 
 ----
