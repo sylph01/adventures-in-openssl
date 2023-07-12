@@ -107,9 +107,9 @@ Dungeons & Dragons, am I right
 - In the past:
   - Encrypt a session key using Public Key Cryptography
     - like RSA
-    - you don't do everything with PKC because it's costly
   - Then send your messages using symmetric ciphers
     - like AES
+  - You don't do everything with PKC because it's costly
 
 ----
 
