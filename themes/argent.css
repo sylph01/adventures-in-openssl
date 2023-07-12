@@ -1,0 +1,129 @@
+/* @theme argent */
+
+@import 'default';
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono&family=Titillium+Web:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+
+section {
+    background-color: #FAF9F5;
+    background-image: url('themes/argent-images/atom-30p.png');
+    background-position: left 0px bottom 0px;
+    background-repeat: no-repeat;
+    background-size: 33%;
+    color: #3F3F3F;
+    font-family: 'Titillium Web', 'Gen Shin Gothic', sans-serif;
+    font-size: 35px;
+}
+
+section h1,
+section h2,
+section h3,
+section h4 {
+    font-family: 'Titillium Web', 'Gen Shin Gothic', sans-serif;
+}
+
+section h1 {
+    font-size: 60px;
+    color: #202020;
+    font-weight: bold;
+}
+
+section.titlepage h1 {
+    font-size: 72px;
+}
+
+section h2 {
+    font-size: 42px;
+    font-weight: 600;
+}
+
+section h3 {
+    font-size: 36px;
+    font-weight: 600;
+}
+
+section h1 strong,
+section h2 strong,
+section h3 strong {
+    color: #4189AC;
+}
+
+/* https://github.com/highlightjs/highlight.js/blob/main/src/styles/monokai-sublime.css */
+
+pre {
+    background: #23241f;
+    color: #f8f8f2;
+}
+
+code {
+  font-family: 'Fira Mono';
+}
+
+.hljs-tag,
+.hljs-subst {
+  color: #f8f8f2;
+}
+
+.hljs-strong,
+.hljs-emphasis {
+  color: #a8a8a2;
+}
+
+.hljs-bullet,
+.hljs-quote,
+.hljs-number,
+.hljs-regexp,
+.hljs-literal,
+.hljs-link {
+  color: #ae81ff;
+}
+
+.hljs-code,
+.hljs-title,
+.hljs-section,
+.hljs-selector-class {
+  color: #a6e22e;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-name,
+.hljs-attr {
+  color: #f92672;
+}
+
+.hljs-symbol,
+.hljs-attribute {
+  color: #66d9ef;
+}
+
+.hljs-params,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #f8f8f2;
+}
+
+.hljs-string,
+.hljs-type,
+.hljs-built_in,
+.hljs-selector-id,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-variable {
+  color: #e6db74;
+}
+
+.hljs-comment,
+.hljs-deletion,
+.hljs-meta {
+  color: #75715e;
+}
