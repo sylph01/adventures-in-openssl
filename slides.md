@@ -357,7 +357,13 @@ If we don't have the building block for modern networking protocols, people woul
 
 # Shoutouts
 
-(TBD)
+(@ mentions are in GitHub ID)
+
+- Ruby OpenSSL maintainers, esp. @rhenium
+- Past RubyKaigi speakers, esp. @unasuke and @shioimm
+- HPKE implementers, esp. @dajiaji
+
+<!-- and whatever conference team I'm submitting to -->
 
 ----
 
