@@ -1,5 +1,5 @@
 ---
-title: Sample
+title: Adventures in the Dungeons of OpenSSL
 paginate: true
 marp: true
 theme: argent
