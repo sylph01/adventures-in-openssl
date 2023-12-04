@@ -145,27 +145,32 @@ Dungeons & Dragons, am I right
 
 # What is HPKE
 
-- The problem
-  - 「公開鍵警察」
-  - dies from misuse
-    - PKCS padding...
+- The problem: There is lots of misuse and implementation bugs in cryptography
+  - PKCS#1 padding in RSA leading to Bleichenbacher's Oracle Attack
+  - Nonce reuse
+    - DSA/ECDSA: leading to leakage of private key in PlayStation 3's code signing
+    - AES's initialization vector use is everywhere!
+
+<!-- also note that "encrypting with private key gives you Digital Signature" is false -->
 
 ----
 
 # What is HPKE
 
 - HPKE solves this by:
-  - Agreement of symmetric keys using a **Key Encapsulation Mechanism (KEM)**
-    - that internally uses a **Key Derivation Function (KDF)**
-  - Then use the symmetric keys to perform **Authenticated Encryption with Associated Data (AEAD)**
+  - Using standardized/reviewed protocols to exchange keys and encrypt/decrypt
+  - Using best known cipher suites possible
+    - combination of cryptographic algorithms
+  - **Using high-level APIs that prevent misuse**
 
 ----
 
 # What is HPKE
 
-- The high-level API of HPKE is designed to prevent misuses
-  - misuse of RSA was very prevalent
-  - nonce reuse of AES-CBC was also very prevalent
+- HPKE uses
+  - Agreement of symmetric keys using a **Key Encapsulation Mechanism (KEM)**
+    - that internally uses a **Key Derivation Function (KDF)**
+  - Then use the symmetric keys to perform **Authenticated Encryption with Associated Data (AEAD)**
 
 ----
 
@@ -331,9 +336,25 @@ an explanation
 
 ----
 
+# Now we have HPKE in Ruby
+
+## GH: [sylph01/hpke-rb](https://github.com/sylph01/hpke-rb)
+
+## `gem install hpke` now!
+
+<!--
+  _footer: note: Still in beta. I will likely tinker around with the API of the gem
+-->
+
 ----
 
-# Well actually, we **had** HPKE itself in OpenSSL 3.0
+----
+
+# Well actually, we **had** HPKE itself in OpenSSL 3.2
+
+<!--
+  _footer: blog post in OpenSSL Blog: https://www.openssl.org/blog/blog/2023/10/18/ossl-hpke/
+-->
 
 ----
 
@@ -341,7 +362,287 @@ an explanation
 
 ----
 
-(about actually writing a wrapper for HPKE)
+# so **I did.**
+
+## GH: [sylph01/openssl, `hpke` branch](https://github.com/sylph01/openssl/tree/hpke)
+
+## (note: this is super experimental territory, DO NOT use in production!)
+
+----
+
+# How to develop C extensions
+
+[GH: ruby/ruby/doc/extension.rdoc](https://github.com/ruby/ruby/blob/master/doc/extension.rdoc) is your friend.
+
+You want to know how to:
+
+- Convert C values into Ruby values and vice versa
+- Wrap a C struct into a Ruby object
+
+<!--
+I know this has been talked a lot at RubyKaigis.
+
+Being able to wrap a C struct into an object was a surprising find.
+You can keep the C struct as an object state but can also prevent it from being accessed from the Ruby layer.
+-->
+
+----
+
+# Handling HPKE Context
+
+```c
+OSSL_HPKE_CTX *OSSL_HPKE_CTX_new(int mode, OSSL_HPKE_SUITE suite, int role,
+                                 OSSL_LIB_CTX *libctx, const char *propq);
+int OSSL_HPKE_encap(OSSL_HPKE_CTX *ctx,
+                    unsigned char *enc, size_t *enclen,
+                    const unsigned char *pub, size_t publen,
+                    const unsigned char *info, size_t infolen);
+int OSSL_HPKE_seal(OSSL_HPKE_CTX *ctx,
+                   unsigned char *ct, size_t *ctlen,
+                   const unsigned char *aad, size_t aadlen,
+                   const unsigned char *pt, size_t ptlen);
+```
+
+<!--
+_footer: https://www.openssl.org/docs/manmaster/man3/OSSL_HPKE_CTX_new.html
+-->
+
+<!--
+You want to first generate a context, then as a sender, encapsulate the key, seal the message, then send the encapsulation and ciphertext to the receiver
+-->
+
+----
+
+# Handling HPKE Context
+
+```c
+static void ossl_hpke_ctx_free(void *ptr) {
+  OSSL_HPKE_CTX_free(ptr);
+}
+
+const rb_data_type_t ossl_hpke_ctx_type = {
+  "OpenSSL/HPKE_CTX",
+  {
+    0, ossl_hpke_ctx_free,
+  },
+  0, 0, RUBY_TYPED_FREE_IMMEDIATELY
+};
+```
+
+<!--
+  define an rb_data_type_t
+  define a function that handles what happens when object is GC'd
+-->
+
+----
+
+# Handling HPKE Context
+
+```c
+static VALUE hpke_ctx_new0(VALUE arg){
+  OSSL_HPKE_CTX *ctx = (OSSL_HPKE_CTX *)arg;
+  VALUE obj;
+
+  obj = rb_obj_alloc(cContext);
+  RTYPEDDATA_DATA(obj) = ctx;
+  return obj;
+}
+
+VALUE ossl_hpke_ctx_new(OSSL_HPKE_CTX *ctx){
+  VALUE obj;
+  int status;
+
+  obj = rb_protect(hpke_ctx_new0, (VALUE)ctx, &status);
+  if (status) {
+    OSSL_HPKE_CTX_free(ctx);
+    rb_jump_tag(status);
+  }
+
+  return obj;
+}
+```
+
+<!--
+  This is pretty much taken from OpenSSL::PKey
+  This wraps the OSSL_HPKE_CTX into the Ruby object
+-->
+
+---
+
+# Handling HPKE Context
+
+```c
+static VALUE ossl_hpke_ctx_alloc(VALUE klass) {
+  return TypedData_Wrap_Struct(klass, &ossl_hpke_ctx_type, NULL);
+}
+
+void Init_ossl_hpke_ctx(void) {
+  mHPKE = rb_define_module_under(mOSSL, "HPKE");
+  cContext = rb_define_class_under(mHPKE, "Context", rb_cObject);
+  ...
+  rb_define_alloc_func(cContext, ossl_hpke_ctx_alloc);
+}
+```
+
+<!--
+  Here we are defining the module and the class in the initializer.
+  rb_define_alloc_func specifies how to allocate the object using the previously defined rb_data_type_t.
+  By default it initializes with a NULL OSSL_HPKE_CTX.
+-->
+
+----
+
+# Generating the key
+
+```c
+int OSSL_HPKE_keygen(OSSL_HPKE_SUITE suite,
+                     unsigned char *pub, size_t *publen, EVP_PKEY **priv,
+                     const unsigned char *ikm, size_t ikmlen,
+                     OSSL_LIB_CTX *libctx, const char *propq);
+```
+
+- `priv` is an `EVP_PKEY` so we can wrap that into `OpenSSL::PKey`
+- `pub` is an `unsigned char *` = String, but which format?
+
+----
+
+# Generating the key
+
+Apparently:
+
+- for EC keys it's the equivalent of `priv.public_key.to_octet_string(:uncompressed)`
+- for X25519/X448 keys it's the equivalent of `priv.raw_public_key`
+
+<!--
+  by the way, OpenSSL::PKey::EC::Point's `to_octet_string` is undocumented in るりま. Only documented in rdoc!
+-->
+
+----
+
+# Encapsulating the key
+
+```c
+VALUE ossl_hpke_encap(VALUE self, VALUE pub, VALUE info) {
+  (snip definitions)
+
+  GetHpkeCtx(self, sctx); // extract C pointer to context from object
+  enclen = sizeof(enc);
+
+  if (OSSL_HPKE_encap(
+       sctx, enc, &enclen,
+       (unsigned char*)RSTRING_PTR(pub), RSTRING_LEN(pub),
+       (unsigned char*)RSTRING_PTR(info), RSTRING_LEN(info)) != 1) {
+    ossl_raise(eHPKEError, "could not encap");
+  }
+
+  enc_obj = rb_str_new((char *)enc, enclen);
+
+  return enc_obj;
+}
+```
+
+<!--
+  Will show only the encapsulation as an example.
+  You want to take out `pub` and `info` as an unsigned char, so get the pointer from the Ruby VALUE usign RSTRING_PTR, cast it to unsigned char, then to get the length use the macro RSTRING_LEN.
+  Then, you wrap the `enc` string into a new Ruby String VALUE.
+-->
+
+----
+
+# How to develop (OpenSSL)
+
+[ruby/openssl's CONTRIBUTING.md](https://github.com/ruby/openssl/blob/master/CONTRIBUTING.md) has a "Testing: With different versions of OpenSSL" section:
+
+- `git checkout openssl-3.2`
+- `OPENSSL_DIR=$HOME/.openssl/openssl-something`
+- `./Configure --prefix=$OPENSSL_DIR --libdir=lib enable-fips enable-trace '-Wl,-rpath,$(LIBRPATH)' -O0 -g3 -ggdb3 -gdwarf-5`
+- `make -j4`, `make install`
+
+----
+
+# How to develop (OpenSSL)
+
+I wanted to peek inside the `OSSL_HPKE_CTX`, but I got an `invalid use of incomplete typedef` error. This is because the full typedef is not exposed to the public header files.
+
+I moved the internal definitions to public header file `<openssl/hpke.h>` then recompiled OpenSSL.
+
+----
+
+# How to develop (OpenSSL gem)
+
+Then to build with that version:
+
+- `bundle exec rake clean`
+- `bundle exec rake compile -- --with-openssl-dir=$OPENSSL_DIR`
+- `irb -I lib -r openssl`
+
+----
+
+# How to develop (debugging)
+
+I wanted to see the C string in hex printed into the console, so:
+
+```c
+void rbdebug_print_hex(const unsigned char *str, size_t len) {
+  VALUE rbstr;
+  rbstr = rb_str_new((char *)str, len);
+  rb_p(rb_funcall(rbstr, rb_intern("unpack1"), 1, rb_str_new_cstr("H*")));
+}
+```
+
+`rb_p` is your friend. Also `rb_funcall` is nice too.
+
+----
+
+# Example
+
+```ruby
+sylph01@grancille:~/projects/openssl-rb$ irb -I lib -r openssl
+# keygen
+irb(main):001:0> priv = OpenSSL::HPKE.keygen(0x0010, 0x0001, 0x0001)
+=> #<OpenSSL::PKey::EC:0x00007f50dfdbb9d8 oid=id-ecPublicKey>
+irb(main):002:0> pub = priv.public_key
+=> #<OpenSSL::PKey::EC::Point:0x00007f50dfd896e0 @group=#<OpenSSL::PKey::EC::Group:0x00007f50dfd896b8>>
+```
+
+----
+
+# Example
+
+```ruby
+# sender
+irb(main):003:0> sctx = OpenSSL::HPKE::Context.new_sender(0x00, 0x10, 0x01, 0x01)
+irb(main):004:0> enc = sctx.encap(pub.to_octet_string(:uncompressed), "Some info")
+=> "\x04_\xC2\x19\xA7\x9B\xBB\xE3\xB6\x01\x9Cn\x8DT..."
+irb(main):005:0> enc.length
+=> 65
+irb(main):006:0> ct = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08", "a message not in a bottle")
+=> "\x82+/\x10\x91\x93\xB8\x00\x80t\x9D>\xD2X\xF6..."
+```
+
+---
+
+# Example
+
+```ruby
+# receiver
+irb(main):007:0> rctx = OpenSSL::HPKE::Context.new_receiver(0x00, 0x10, 0x01, 0x01)
+=> #<OpenSSL::HPKE::Context:0x00007f50e4fd9b70>
+irb(main):008:0> rctx.decap(enc, priv, "Some info")
+=> true
+irb(main):009:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
+=> "a message not in a bottle"
+```
+
+----
+
+# Will this go into actual OpenSSL gem?
+
+This still needs a lot of work:
+
+- This is limited to OpenSSL 3.2, so needs guards against older versions
+- Hardcoded length values need to be fixed
+- Is the C coding actually safe?
 
 ----
 
@@ -352,7 +653,7 @@ an explanation
 
 ----
 
-# So here was my **"Adventures in the Forgotten Realm"** called OpenSSL
+# So here were my **"Adventures in the Forgotten Realm"** called OpenSSL
 
 ----
 

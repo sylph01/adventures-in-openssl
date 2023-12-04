@@ -55,6 +55,11 @@ section h3 strong {
     color: #4189AC;
 }
 
+footer {
+    color: #606060;
+    font-size: 20px;
+}
+
 /* https://github.com/highlightjs/highlight.js/blob/main/src/styles/monokai-sublime.css */
 
 pre {
