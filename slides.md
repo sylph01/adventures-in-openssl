@@ -8,8 +8,8 @@ theme: argent
 <!-- _class: titlepage -->
 
 # Adventures in the Dungeons of OpenSSL
-## Ryo Kajiwara (sylph01), 2023/07/12
-### @ somewhere?
+## Ryo Kajiwara/梶原 龍 (sylph01), 2023/12/15
+### @ RubyConf Taiwan 2023
 
 ---
 
@@ -19,11 +19,23 @@ theme: argent
 
 ---
 
-<!-- _class: titlepage -->
+<!--
+  _class: titlepage_white
+-->
 
 # I do stuff
 
-<!-- DDR, bassoon, Magic: the Gathering, trains(rails) -->
+- Play rhythm games (especially DanceDanceRevolution)
+- Play the bassoon/contrabassoon
+- Ride a lot of trains (Rails!) (travelled on 99% of JR)
+
+if anything catches your interest let's talk!
+
+![bg brightness:0.7](images/Screenshot_20231204_183910.png)
+
+![bg brightness:0.7](images/cfg_long.png)
+
+![bg brightness:0.7](images/PXL_20210729_041115019.jpg)
 
 ---
 
@@ -31,7 +43,13 @@ theme: argent
 
 # And I do stuff
 
-<!-- ISOC-JP, W3C, IETF, current work -->
+that is more relevant to this talk:
+
+- Freelance web developer focused on Digital Identity and Security
+  - Mainly working at codeTakt, developing ID platforms for schools
+- Worked/ing on writing/editing and implementing standards
+  - HTTPS in Local Network CG / Web of Things WG @ W3C, OAuth / Messaging Layer Security WG @ IETF
+- Worked as an Officer of Internet Society Japan Chapter (2020-23)
 
 ---
 
@@ -39,7 +57,19 @@ theme: argent
 
 # I'm from the **Forgotten Realm** of Japan called **Shikoku**
 
----
+![bg right 80% contain](images/DcwvXpdX4AA9x1Q.jpeg)
+
+<!-- _footer: image https://twitter.com/Mitchan_599/status/994221711942971392 -->
+
+----
+
+# My ticket this time was from **松山(Matsuyama)** to **松山(Songshan)**
+
+![bg right 80% contain](images/P_20180428_183615.jpg)
+
+----
+
+----
 
 <!-- _class: titlepage -->
 

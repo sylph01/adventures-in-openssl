@@ -31,6 +31,14 @@ section.titlepage h1 {
     font-size: 84px;
 }
 
+section.titlepage_white h1 {
+    color: #f8f8f2;
+}
+
+section.titlepage_white {
+  color: #f8f8f2;
+}
+
 section h2 {
     font-size: 48px;
     font-weight: 600;
