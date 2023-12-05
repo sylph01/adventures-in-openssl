@@ -13,6 +13,14 @@ theme: argent
 
 ---
 
+# Slides are available at:
+
+## https://speakerdeck.com/sylph01/adventures-in-the-dungeons-of-openssl
+
+![bg right](images/frame.png)
+
+---
+
 <!-- _class: titlepage -->
 
 # Hi!
@@ -679,6 +687,8 @@ irb(main):002:0> pub = priv.public_key
 => #<OpenSSL::PKey::EC::Point:0x00007f50dfd896e0 @group=#<OpenSSL::PKey::EC::Group:0x00007f50dfd896b8>>
 ```
 
+- Generate a public/private key pair
+
 ----
 
 # Example
@@ -694,6 +704,10 @@ irb(main):006:0> ct = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08", "a message n
 => "\x82+/\x10\x91\x93\xB8\x00\x80t\x9D>\xD2X\xF6..."
 ```
 
+- Create sender context
+- Encapsulate key into the public key of the receiver
+- Using the generated shared secret, seal message
+
 ---
 
 # Example
@@ -708,6 +722,11 @@ irb(main):009:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
 => "a message not in a bottle"
 ```
 
+- Receiver gets the encapsulation `enc` and sealed message `ct`
+- Create receiver context
+- Decapsulate key from `enc` with private key and derive shared secret
+- Then using the derived shared secret, open message
+
 ----
 
 # Will this go into actual OpenSSL gem?
@@ -715,6 +734,7 @@ irb(main):009:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
 This still needs a lot of work:
 
 - This is limited to OpenSSL 3.2, so needs guards against older versions
+- Currently supports Base mode only
 - Hardcoded length values need to be fixed
 - Is the C coding actually safe?
 
