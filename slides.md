@@ -28,6 +28,7 @@ theme: argent
 - Play rhythm games (especially DanceDanceRevolution)
 - Play the bassoon/contrabassoon
 - Ride a lot of trains (Rails!) (travelled on 99% of JR)
+- Build keyboards
 
 if anything catches your interest let's talk!
 
@@ -36,6 +37,8 @@ if anything catches your interest let's talk!
 ![bg brightness:0.7](images/cfg_long.png)
 
 ![bg brightness:0.7](images/PXL_20210729_041115019.jpg)
+
+![bg brightness:0.7](images/keebs.png)
 
 ---
 
