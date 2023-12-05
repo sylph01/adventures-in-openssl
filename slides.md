@@ -165,7 +165,7 @@ The level of production-readiness in this talk:
   - PKCS#1 padding in RSA leading to Bleichenbacher's Oracle Attack
   - Nonce reuse
     - DSA/ECDSA: leading to leakage of private key in PlayStation 3's code signing
-    - AES's initialization vector use is everywhere!
+    - AES's initialization vector re-use is everywhere!
 
 <!-- also note that "encrypting with private key gives you Digital Signature" is false -->
 
@@ -196,7 +196,7 @@ The level of production-readiness in this talk:
 
 # What is needed for HPKE?
 
-- Key Encapsulation Function
+- Key Encapsulation Mechanism
   - Diffie-Hellman Key Exchange
     - use of Elliptic Curves: P-256, P-384, P-521, X25519, X448
 - Key Derivation Function
