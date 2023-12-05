@@ -8,8 +8,8 @@ theme: argent
 <!-- _class: titlepage -->
 
 # Adventures in the Dungeons of OpenSSL
-## Ryo Kajiwara/梶原 龍 (sylph01), 2023/12/15
-### @ RubyConf Taiwan 2023
+## Ryo Kajiwara/梶原 龍 (sylph01)
+### 2023/12/15 @ RubyConf Taiwan 2023
 
 ---
 
