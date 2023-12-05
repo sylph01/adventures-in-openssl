@@ -32,13 +32,13 @@ theme: argent
 
 if anything catches your interest let's talk!
 
-![bg brightness:0.7](images/Screenshot_20231204_183910.png)
+![bg brightness:0.5](images/Screenshot_20231204_183910.png)
 
-![bg brightness:0.7](images/cfg_long.png)
+![bg brightness:0.5](images/cfg_long.png)
 
-![bg brightness:0.7](images/PXL_20210729_041115019.jpg)
+![bg brightness:0.5](images/PXL_20210729_041115019.jpg)
 
-![bg brightness:0.7](images/keebs.png)
+![bg brightness:0.5](images/keebs.png)
 
 ---
 
