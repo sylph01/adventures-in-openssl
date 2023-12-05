@@ -336,14 +336,16 @@ it's even in Ruby 3.3 preview1!
 # `PKey` -> DER -> ASN.1 Sequence
 
 ```ruby
-pk = OpenSSL::PKey.generate_key('x25519')
+pk = OpenSSL::PKey::EC.generate('prime256v1')
 pk.private_to_der.unpack1('H*')
 =>
-"302e020100300506032b656
- e04220420a8a1158c265048
- 42b9979b53f16e86b8b127a
- 004c1481956631ac1563367
- 0e60"
+"308187020100301306072a8648ce3d020106082a8648
+ ce3d030107046d306b02010104203baadea1f85b96b3
+ 3b8a895ab2c44a4b72e827ff1b1ac23e7b756daef2f0
+ 892ba14403420004b9f0779b47f432fd7df13b67cf21
+ 0c58db276653a13b862db2eb6d47f3eabe9ac4317181
+ 8e19e78f37fe5e86a7439d471d0f3442a2b727f9560a
+ ff417d432391"
 ```
 
 (formatting just for visibility purposes)
@@ -352,7 +354,7 @@ pk.private_to_der.unpack1('H*')
 
 # `PKey` -> DER -> ASN.1 Sequence
 
-![](images/Screenshot_20231205_110525.png)
+![](images/Screenshot_20231205_112035.png)
 
 <!--
   _footer: https://lapo.it/asn1js/
