@@ -90,19 +90,11 @@ that is more relevant to this talk:
 
 # ... so there be **Dragons**
 
+## Dungeons & Dragons, am I right?
+
 <!--
 https://en.wikipedia.org/wiki/Here_be_dragons
-
-Dungeons & Dragons, am I right
 -->
-
-----
-
-<!-- _class: titlepage -->
-
-# Maybe try this at home,
-
-# but **definitely not in production** unless you're super sure
 
 ----
 
@@ -116,9 +108,22 @@ Dungeons & Dragons, am I right
 
 ----
 
+# Caution
+
+The level of production-readiness in this talk:
+
+- The `hpke` gem: Almost ready
+  - Minor changes in the gem API are possible
+  - Mostly uses pretty safe stuff
+  - But not audited by an external security expert
+- OpenSSL extension version of HPKE: **Definitely not**
+
+----
+
 # Past Related Work
 
 - [Do Pure Ruby Dream of Encrypted Binary Protocol? / Yusuke Nakamura @ RubyKaigi 2021](https://youtu.be/hCos6p_S-qc)
+  - Implementing QUIC in Ruby
   - Talks about the pain of handling hex-encoded and raw strings in Ruby
   - Also talks about implementing protocols
 
@@ -229,8 +234,6 @@ Dungeons & Dragons, am I right
 ----
 
 # Really? These seem to be undocumented
-
-(as I heard from an undisclosed Ruby committer)
 
 Some APIs in OpenSSL are intentionally left undocumented to avoid misuses by people who are not well-versed in cryptography.
 
