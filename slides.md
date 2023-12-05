@@ -245,7 +245,11 @@ Yes, misuse in cryptography **can hurt yourself.**
 
 # `OpenSSL::PKey`
 
-an explanation
+Set of classes that handle everything Public Key Cryptography, including RSA, DSA, Diffie-Hellman, and Elliptic Curve Cryptography.
+
+Wraps OpenSSL's `EVP_PKEY` struct.
+
+Note that X25519/X448 is actually ECC but does not use `OpenSSL::PKey::EC`.
 
 ----
 
@@ -274,6 +278,10 @@ an explanation
 ----
 
 # `OpenSSL::PKey` is immutable in OpenSSL 3.0
+
+<!--
+  _footer: https://github.com/ruby/openssl/issues/619
+-->
 
 ----
 
@@ -318,15 +326,73 @@ it's even in Ruby 3.3 preview1!
 
 # Enter **ASN.1**
 
+- Abstract Syntax Notation One
+  - Set of binary notation rules for encoding data structures
+- DER (Distinguished Encoding Rules) is the ruleset to describe data structures in exactly one way, so as to ensure digital signatures produce a unique output
+- PEM files encode certificates private keys written in DER with Base64
+
 ----
 
-# ASN.1?
+# `PKey` -> DER -> ASN.1 Sequence
 
-an explanation
+```ruby
+pk = OpenSSL::PKey.generate_key('x25519')
+pk.private_to_der.unpack1('H*')
+=>
+"302e020100300506032b656
+ e04220420a8a1158c265048
+ 42b9979b53f16e86b8b127a
+ 004c1481956631ac1563367
+ 0e60"
+```
+
+(formatting just for visibility purposes)
 
 ----
 
-# I did this in my initial HPKE gem for X25519/X448 too
+# `PKey` -> DER -> ASN.1 Sequence
+
+![](images/Screenshot_20231205_110525.png)
+
+<!--
+  _footer: https://lapo.it/asn1js/
+-->
+
+----
+
+# ASN.1 Sequence -> DER -> `PKey::EC`
+
+# **Do it backwards!**
+
+```ruby
+  def create_key_pair_from_secret(secret)
+    asn1_seq = OpenSSL::ASN1.Sequence([
+      OpenSSL::ASN1.Integer(1),
+      OpenSSL::ASN1.OctetString(secret),
+      OpenSSL::ASN1.ObjectId(curve_name, 0, :EXPLICIT)
+    ])
+
+    OpenSSL::PKey.read(asn1_seq.to_der)
+  end
+```
+
+----
+
+# I did this in the HPKE gem for X25519/X448 too
+
+```ruby
+  def create_key_pair_from_secret(secret)
+    asn1_seq = OpenSSL::ASN1.Sequence([
+      OpenSSL::ASN1.Integer(0),
+      OpenSSL::ASN1.Sequence([
+        OpenSSL::ASN1.ObjectId(asn1_oid)
+      ]),
+      OpenSSL::ASN1.OctetString("\x04\x20" + secret)
+    ])
+
+    OpenSSL::PKey.read(asn1_seq.to_der)
+  end
+```
 
 ----
 
@@ -338,7 +404,7 @@ an explanation
 
 # API to generate PKeys with a private key
 
-(after I actually work on this)
+[is being worked on @ Issue #555](https://github.com/ruby/openssl/pull/555)
 
 ----
 
