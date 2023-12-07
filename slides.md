@@ -263,6 +263,12 @@ Note that X25519/X448 is actually ECC but does not use `OpenSSL::PKey::EC`.
 
 # Raw public/private key support for X25519/X448
 
+## Raw public/private key support for EC "kinda" existed
+
+<!--
+Looking at the specs, I found out that I needed a way to make a OpenSSL::PKey with a specific binary value as its private key. It looked like there was a way to do it for OpenSSL::PKey::EC but not X25519/X448 so I digged into how I can support raw public/private key pairs in X25519/X448.
+-->
+
 ----
 
 # Raw public/private key support for X25519/X448
