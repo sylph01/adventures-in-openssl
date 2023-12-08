@@ -755,6 +755,7 @@ rctx = OpenSSL::HPKE::Context.new(:base, :receiver, suite)
 This still needs a lot of work:
 
 - This is limited to OpenSSL 3.2, so needs guards against older versions
+  - It kinda has guards but not as friendly
 - Currently supports Base mode only
 - Hardcoded length values need to be fixed
 - Is the C coding actually safe?
