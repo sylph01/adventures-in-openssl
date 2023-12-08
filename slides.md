@@ -735,6 +735,21 @@ irb(main):009:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
 
 ----
 
+# Some more examples
+
+```ruby
+suite = OpenSSL::HPKE::Suite.new_with_names(
+  :dhkem_p256_hkdf_sha256, :hkdf_sha256, :aes_128_gcm)
+priv = OpenSSL::HPKE.keygen_with_suite(suite)
+sctx = OpenSSL::HPKE::Context.new(:base, :sender, suite)
+rctx = OpenSSL::HPKE::Context.new(:base, :receiver, suite)
+```
+
+- You can specify cipher suite with KEM/KDF/AEAD names
+- and use the `Suite` instance to generate keys and instantiate `Context`s
+
+----
+
 # Will this go into actual OpenSSL gem?
 
 This still needs a lot of work:
