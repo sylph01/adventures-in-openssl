@@ -78,6 +78,11 @@ that is more relevant to this talk:
 
 ![bg right 80% contain](images/P_20180428_183615.jpg)
 
+<!--
+This picture is the clock in Songshan. This design comes from the clock that exists in Matsuyama's Dogo Onsen.
+The direct flight from Taoyuan to Matsuyama will restart operation next March, so please visit us if you have a chance!
+-->
+
 ----
 
 ----
@@ -133,7 +138,6 @@ The level of production-readiness in this talk:
 - [Do Pure Ruby Dream of Encrypted Binary Protocol? / Yusuke Nakamura @ RubyKaigi 2021](https://youtu.be/hCos6p_S-qc)
   - Implementing QUIC in Ruby
   - Talks about the pain of handling hex-encoded and raw strings in Ruby
-  - Also talks about implementing protocols
 
 <!-- By the way, the answer to this question is: "Yes it does. I'm going to talk about one." -->
 
@@ -157,6 +161,10 @@ The level of production-readiness in this talk:
     - like AES
   - You don't do everything with PKC because it's costly
 
+<!--
+By the way I'm going to throw a lot of these cryptography words/algorithm names during this presentation, please look them up later
+-->
+
 ----
 
 # What is HPKE
@@ -167,7 +175,18 @@ The level of production-readiness in this talk:
     - DSA/ECDSA: leading to leakage of private key in PlayStation 3's code signing
     - AES's initialization vector re-use is everywhere!
 
-<!-- also note that "encrypting with private key gives you Digital Signature" is false -->
+<!--
+- Bleichenbacker's Oracle Attack: Bad padding method enables you to decrypt messages way easier than in theory
+- Get code signing key, sign homebrew and pirated software as legit!
+-->
+
+----
+
+# What is HPKE
+
+- You (typically) don't **encrypt/decrypt** with Elliptic Curve Cryptography
+  - You get **key exchange** (ECDH) and **digital signatures** (ECDSA)
+  - so the "encrypt with Public Key" trick doesn't work
 
 ----
 
@@ -178,6 +197,10 @@ The level of production-readiness in this talk:
   - Using best known cipher suites possible
     - combination of cryptographic algorithms
   - **Using high-level APIs that prevent misuse**
+
+<!--
+HPKE's high level API wraps the commonly misused parts such as nonce generation. Key pairs are generated per session, so by not reusing the context, you will get a fresh nonce derived from the random values every time.
+-->
 
 ----
 
@@ -257,7 +280,11 @@ Set of classes that handle everything Public Key Cryptography, including RSA, DS
 
 Wraps OpenSSL's `EVP_PKEY` struct.
 
-Note that X25519/X448 is actually ECC but does not use `OpenSSL::PKey::EC`.
+Note that X25519/X448 are actually ECC but does not use `OpenSSL::PKey::EC`.
+
+<!--
+I will not go into details but X25519/X448 are implemented differently compared to generic ECs
+-->
 
 ----
 
@@ -308,7 +335,7 @@ pkey.private_key = SecureRandom.random_bytes(32)
 
 Note: A private key of `P-256` elliptic curve consists of a 32 byte number (=scalar).
 
-<!-- To be more accurate, it is a positive number under the "order" of the generator, which in `P-256`'s case is `0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551`. -->
+<!-- To be more accurate, it is a positive number under the "order" of the generator, which in `P-256`'s case is `0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551` (pretty close to max of 32-bit integer). -->
 
 ----
 
@@ -392,6 +419,10 @@ pk.private_to_der.unpack1('H*')
   end
 ```
 
+<!--
+This is the Elliptic Curve Private Key Structure specified in RFC 5915 https://datatracker.ietf.org/doc/html/rfc5915 .
+-->
+
 ----
 
 # I did this in the HPKE gem for X25519/X448 too
@@ -410,11 +441,20 @@ pk.private_to_der.unpack1('H*')
   end
 ```
 
+<!--
+This one is specified in RFC 8410 Section 7 https://datatracker.ietf.org/doc/html/rfc8410#section-7.
+Note that the OctetString here begins in 0x04 0x20. This denotes a 32-byte long OctetString with the secret value, wrapped inside another OctetString. Somehow the spec is written in a way that the CurvePrivateKey is wrapped inside PrivateKey.
+-->
+
 ----
 
 # But does this look good?
 
 # **No, it's ugly!**
+
+<!--
+It looks especially hacky with that OctetString-inside-an-OctetString trick
+-->
 
 ----
 
@@ -714,6 +754,10 @@ irb(main):006:0> ct = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08", "a message n
 - Encapsulate key into the public key of the receiver
 - Using the generated shared secret, seal message
 
+<!--
+in addition to the plaintext, seal takes an Additional Associated Data that is passed to the AEAD function
+-->
+
 ---
 
 # Example
@@ -755,10 +799,13 @@ rctx = OpenSSL::HPKE::Context.new(:base, :receiver, suite)
 This still needs a lot of work:
 
 - This is limited to OpenSSL 3.2, so needs guards against older versions
-  - It kinda has guards but not as friendly
 - Currently supports Base mode only
 - Hardcoded length values need to be fixed
 - Is the C coding actually safe?
+
+<!--
+I fixed the hardcoded buffer lengths but I'm not sure I'm doing it the right way
+-->
 
 ----
 
@@ -770,6 +817,10 @@ This still needs a lot of work:
 ----
 
 # So here were my **"Adventures in the Forgotten Realm"** called OpenSSL
+
+<!--
+This is both a DnD reference and a Magic: the Gathering reference
+-->
 
 ----
 
@@ -816,7 +867,7 @@ If we don't have the building block for modern networking protocols, people woul
 - Past RubyKaigi speakers, esp. @unasuke and @shioimm
 - HPKE implementers, esp. @dajiaji
 
-<!-- and whatever conference team I'm submitting to -->
+And to the organizers of RubyConf Taiwan 2023!
 
 ----
 
