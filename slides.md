@@ -213,6 +213,17 @@ HPKE's high level API wraps the commonly misused parts such as nonce generation.
 
 ----
 
+# How to use HPKE
+
+- HPKE is a **one-way** protocol from Sender to Receiver
+  - Agreement of symmetric key using secret exporter is possible
+- Receiver creates a public/private key pair, publishes public key
+- Sender uses public key to **encapsulate** session key, then uses the session key to encrypt message
+- Sender sends **the encapsulation and the message**
+- Receiver uses the encapsulation to **decapsulate** session key, uses the session key to decrypt the message
+
+----
+
 # So I wanted HPKE in Ruby...
 
 ----
@@ -725,12 +736,13 @@ void rbdebug_print_hex(const unsigned char *str, size_t len) {
 # Example
 
 ```ruby
-sylph01@grancille:~/projects/openssl-rb$ irb -I lib -r openssl
-# keygen
-irb(main):001:0> priv = OpenSSL::HPKE.keygen(0x0010, 0x0001, 0x0001)
-=> #<OpenSSL::PKey::EC:0x00007f50dfdbb9d8 oid=id-ecPublicKey>
-irb(main):002:0> pub = priv.public_key
-=> #<OpenSSL::PKey::EC::Point:0x00007f50dfd896e0 @group=#<OpenSSL::PKey::EC::Group:0x00007f50dfd896b8>>
+irb(main):001:0> suite = OpenSSL::HPKE::Suite.new_with_names(
+  :dhkem_p256_hkdf_sha256, :hkdf_sha256, :aes_128_gcm)
+=> #<OpenSSL::HPKE::Suite:0x00007f5460d55b68 @aead_id=1, @kdf_id=1, @kem_id=16>
+irb(main):002:0> priv = OpenSSL::HPKE.keygen_with_suite(suite)
+irb(main):003:0> pub = priv.public_key
+=> #<OpenSSL::PKey::EC::Point:0x00007f5460d67520
+    @group=#<OpenSSL::PKey::EC::Group:0x00007f5460d674d0>>
 ```
 
 - Generate a public/private key pair
@@ -741,13 +753,12 @@ irb(main):002:0> pub = priv.public_key
 
 ```ruby
 # sender
-irb(main):003:0> sctx = OpenSSL::HPKE::Context.new_sender(0x00, 0x10, 0x01, 0x01)
-irb(main):004:0> enc = sctx.encap(pub.to_octet_string(:uncompressed), "Some info")
-=> "\x04_\xC2\x19\xA7\x9B\xBB\xE3\xB6\x01\x9Cn\x8DT..."
-irb(main):005:0> enc.length
-=> 65
-irb(main):006:0> ct = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08", "a message not in a bottle")
-=> "\x82+/\x10\x91\x93\xB8\x00\x80t\x9D>\xD2X\xF6..."
+irb(main):004:0> sctx = OpenSSL::HPKE::Context::Sender.new(:base, suite)
+=> #<OpenSSL::HPKE::Context::Sender:0x00007f5460d22768 @aead_id=1, @kdf_id=1, @kem_id=16>
+irb(main):005:0> enc = sctx.encap(pub.to_octet_string(:uncompressed), "Some info")
+irb(main):006:0> ct  = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08",
+  "a message not in a bottle")
+=> "\x93\xC1\xDF7\x87\xA8\xBER\xC9&\xA4\xD1\xB7\x10\x8E..."
 ```
 
 - Create sender context
@@ -758,16 +769,19 @@ irb(main):006:0> ct = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08", "a message n
 in addition to the plaintext, seal takes an Additional Associated Data that is passed to the AEAD function
 -->
 
+<!--
+  _footer: before commit `4548dd0e` it uses a different style of initialization API
+-->
+
 ---
 
 # Example
 
 ```ruby
 # receiver
-irb(main):007:0> rctx = OpenSSL::HPKE::Context.new_receiver(0x00, 0x10, 0x01, 0x01)
-=> #<OpenSSL::HPKE::Context:0x00007f50e4fd9b70>
+irb(main):007:0> rctx = OpenSSL::HPKE::Context::Receiver.new(:base, suite)
+=> #<OpenSSL::HPKE::Context::Receiver:0x00007f5460d64e88 @aead_id=1, @kdf_id=1, @kem_id=16>
 irb(main):008:0> rctx.decap(enc, priv, "Some info")
-=> true
 irb(main):009:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
 => "a message not in a bottle"
 ```
@@ -779,18 +793,26 @@ irb(main):009:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
 
 ----
 
-# Some more examples
+# By the way...
+
+Is anyone familiar with Ruby's encoding? I don't want the force_encoding but I kinda need it now
 
 ```ruby
-suite = OpenSSL::HPKE::Suite.new_with_names(
-  :dhkem_p256_hkdf_sha256, :hkdf_sha256, :aes_128_gcm)
-priv = OpenSSL::HPKE.keygen_with_suite(suite)
-sctx = OpenSSL::HPKE::Context.new(:base, :sender, suite)
-rctx = OpenSSL::HPKE::Context.new(:base, :receiver, suite)
+irb(main):010:0> sctx = OpenSSL::HPKE::Context::Sender.new(:base, suite)
+irb(main):011:0> rctx = OpenSSL::HPKE::Context::Receiver.new(:base, suite)
+=> #<OpenSSL::HPKE::Context::Receiver:0x00007f5460d2d8c0 @aead_id=1, @kdf_id=1, @kem_id=16>
+irb(main):012:0> enc = sctx.encap(pub.to_octet_string(:uncompressed), "Some info")
+=> "\x04\x17M\b\xE0\x9D\xEEg\xE2..."
+irb(main):013:0> ct  = sctx.seal("\x01\x02\x03\x04\x05\x06\x07\x08", "ニッホンゴー")
+=> "E\x80\xEFP\x95Z9N\x1F\t..."
+irb(main):014:0>
+irb(main):015:0> rctx.decap(enc, priv, "Some info")
+=> true
+irb(main):016:0> pt = rctx.open("\x01\x02\x03\x04\x05\x06\x07\x08", ct)
+irb(main):017:0> puts pt.force_encoding('UTF-8')
+ニッホンゴー
+=> nil
 ```
-
-- You can specify cipher suite with KEM/KDF/AEAD names
-- and use the `Suite` instance to generate keys and instantiate `Context`s
 
 ----
 
