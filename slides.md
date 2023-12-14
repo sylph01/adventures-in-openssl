@@ -143,6 +143,22 @@ The level of production-readiness in this talk:
 
 ----
 
+# A Very Quick Recap of Public Key Encrypytion
+
+![inline](images/Public_key_encryption.svg)
+
+<!--
+- Alice generates key pair
+- Bob encrypts with Public Key
+- Alice can decrypt with Private Key
+
+Most of the time, it is the randomly generated symmetric key (your normal encryption that encryption/decryption works with the same key) that is going to be encrypted here.
+
+forget about the other way around. it doesn't work most of the time.
+-->
+
+----
+
 ----
 
 <!-- _class: titlepage -->
