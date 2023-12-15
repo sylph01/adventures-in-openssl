@@ -143,9 +143,22 @@ The level of production-readiness in this talk:
 
 ----
 
-# A Very Quick Recap of Public Key Encrypytion
+----
 
-![inline](images/Public_key_encryption.svg)
+<!-- _class: titlepage -->
+
+# HPKE
+## Hybrid Public Key Encryption, RFC 9180
+
+----
+
+# Recap: Public Key Encrypytion
+
+![bg right contain](images/Public_key_encryption.svg)
+
+- Alice generates key pair
+- Bob encrypts with Public Key
+- Alice can decrypt with Private Key
 
 <!--
 - Alice generates key pair
@@ -155,16 +168,12 @@ The level of production-readiness in this talk:
 Most of the time, it is the randomly generated symmetric key (your normal encryption that encryption/decryption works with the same key) that is going to be encrypted here.
 
 forget about the other way around. it doesn't work most of the time.
+
+By the way I'm going to throw a lot of these cryptography words/algorithm names during this presentation, please look them up later
 -->
-
-----
-
-----
-
-<!-- _class: titlepage -->
-
-# HPKE
-## Hybrid Public Key Encryption, RFC 9180
+<!--
+_footer: https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg
+-->
 
 ----
 
@@ -176,10 +185,6 @@ forget about the other way around. it doesn't work most of the time.
   - Then send your messages using symmetric ciphers
     - like AES
   - You don't do everything with PKC because it's costly
-
-<!--
-By the way I'm going to throw a lot of these cryptography words/algorithm names during this presentation, please look them up later
--->
 
 ----
 
