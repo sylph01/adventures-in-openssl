@@ -875,6 +875,10 @@ It's the building block for modern security/privacy protocols
 - Oblivious HTTP
 - Messaging Layer Security
 
+<!--
+明に「Why did I want HPKE in Ruby in the first place?」という表現を使う
+-->
+
 ----
 
 # **Why** HPKE in Ruby?
